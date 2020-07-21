@@ -1,0 +1,14 @@
+## Ignore files
+
+# Visual Studio or Angular or node js packages
+node_modules/
+
+# Visual Studio Build results
+[Dd]ebug/
+[Rr]elease/
+[Bb]in/
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio cache/options directory
+.vs/

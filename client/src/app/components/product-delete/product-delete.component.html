@@ -1,0 +1,30 @@
+<mat-card>
+    <mat-card-title>{{title}}</mat-card-title>
+    <div class="container">
+        <mat-form-field>
+            <mat-label>Id</mat-label>
+            <textarea matInput [value]="data.id" readonly></textarea>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Category</mat-label>
+            <textarea matInput [value]="data.categoryName" readonly></textarea>
+        </mat-form-field>        
+        <mat-form-field>
+            <mat-label>Name</mat-label>
+            <textarea matInput [value]="data.name" readonly></textarea>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Description</mat-label>
+            <textarea matInput [value]="data.description" readonly></textarea>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Price</mat-label>
+            <textarea matInput [value]="data.price" readonly></textarea>
+        </mat-form-field>
+        <img *ngIf="imageUrl" [src]="imageUrl">
+    </div>    
+    <div class="action-button">
+        <button mat-flat-button (click)="onDelete()" color="primary">Delete</button>
+        <button mat-flat-button (click)="onCancel()" color="primary">Cancel</button>
+    </div>
+</mat-card>

@@ -1,0 +1,19 @@
+MariaDB Server must be installed. Set UTF-8 encoding for it if required.
+
+Verify that the password of the ConnectionStrings section of the appsettings.json file of the server project matches the MariaDB server password.
+
+The client project needs to install node modules (npm install).	
+
+You can log in to the system using this data
+
+Admin
+login: admin@auction.com
+password: 111111
+
+User
+login: ivan@gmail.com
+password: 222222
+
+Selling a product starts from a moment when the administrator added it to the database.
+
+Selling a product stops from a moment when the administrator deleted it from the database. At this point the auction application sends by email to the winning buyer  about where to buy the product.

@@ -1,0 +1,15 @@
+<mat-card class="card" *ngIf="product$ | async as product">
+    <mat-card-header>
+        <mat-card-title>{{product.name}}</mat-card-title>
+    </mat-card-header>
+    <img mat-card-image [src]="imageUrl + product.imageFileName" alt="Photo of a monitor">
+    <ng-container *ngIf="sellerPrice$ | async; let sellerPrice">
+        <mat-card-content>
+            <mat-card-content>{{product.description}}</mat-card-content>
+            <mat-card-title>{{sellerPrice | number:'1.2-2'}}</mat-card-title>                                      
+        </mat-card-content>
+        <mat-card-actions>
+            <button mat-flat-button color="primary" (click)="buy(product.id)" [disabled]="sellerPrice === 0">Buy</button>
+        </mat-card-actions>
+    </ng-container>               
+</mat-card>

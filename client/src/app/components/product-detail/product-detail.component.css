@@ -1,0 +1,11 @@
+.card {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    width: 30%;           
+    margin: auto;                        
+}
+
+.header-image {    
+    background-size: contain;
+}

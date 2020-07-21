@@ -1,0 +1,16 @@
+.action {
+    display: flex;
+    justify-content: space-between;
+}
+
+.action>button:nth-child(1) {
+    align-self: center;
+}
+
+table {
+    width: 100%;
+}
+
+td>button {
+    margin: 5px;
+}

@@ -1,0 +1,22 @@
+.action {
+    display: flex;
+    justify-content: space-between;    
+}
+
+.action>button:nth-child(1) {
+    align-self: center;
+}
+
+.images { 
+    display: grid;
+    width: 100%;
+    grid-template-columns: 20% 20% 20% 20% 20%;                      
+}
+
+.card {
+    margin: 10px;
+}
+
+.header-image {    
+    background-size: contain;
+}

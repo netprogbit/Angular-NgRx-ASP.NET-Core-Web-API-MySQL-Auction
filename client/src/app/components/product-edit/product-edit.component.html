@@ -1,0 +1,55 @@
+<mat-card>
+  <mat-card-title>{{title}}</mat-card-title>
+  <form [formGroup]="editForm" (ngSubmit)="onSubmit()">
+    <div class="container">
+      <mat-form-field>
+        <input matInput placeholder="ID" formControlName="id" readonly>
+        <mat-error *ngIf="efc.id.errors?.required">
+          ID name is required
+        </mat-error>
+      </mat-form-field>      
+      <mat-form-field>               
+        <mat-select [ngModel]="selectedCategoryName" placeholder="Select category" formControlName="categoryName">
+          <mat-option *ngFor="let category of allCategories$ | async" [value]="category.name">
+            {{category.name}}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="efc.categoryName.errors?.required">
+          Category name is required
+        </mat-error>       
+      </mat-form-field>                 
+      <mat-form-field>
+        <input matInput placeholder="Name" formControlName="name">
+        <mat-error *ngIf="efc.name.errors?.required">
+          Name is required
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput placeholder="Description" formControlName="description">
+        <mat-error *ngIf="efc.description.errors?.required">
+          Description is required
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput [value]="editForm.get('price').value" placeholder="Price" formControlName="price">
+        <mat-error *ngIf="efc.price?.invalid">
+          <div *ngIf="efc.price?.errors?.required">Price is required</div>
+          <div *ngIf="efc.price?.errors?.pattern">Price is invalid</div>
+        </mat-error>
+      </mat-form-field>                                   
+      <img *ngIf="imageUrl" [src]="imageUrl">      
+      <button mat-flat-button type="button" color="primary" (click)='fileinput.click()'>
+        <mat-icon>attach_file</mat-icon>
+        Choose Image         
+      </button>      
+      <input #fileinput hidden type='file' (change)='select($event)'>            
+    </div>
+    <ng-container *ngIf="progress$ | async; let progress">
+      <mat-progress-bar mode="determinate" value="{{progress}}" *ngIf="progress > 0"></mat-progress-bar> 
+    </ng-container>        
+    <div class="action-button">
+      <button mat-flat-button type="submit" [disabled]="editForm.invalid" color="primary">Save</button>
+      <button mat-flat-button type="button" (click)="onCancel()" color="primary">Cancel</button>
+    </div>    
+  </form>
+</mat-card>

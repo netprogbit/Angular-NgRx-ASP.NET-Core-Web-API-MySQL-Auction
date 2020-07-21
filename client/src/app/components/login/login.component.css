@@ -1,0 +1,13 @@
+mat-card, form {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;                            
+}
+
+mat-card-title {
+    text-align: center; 
+}
+
+.submit {
+    align-self: flex-end;   
+}

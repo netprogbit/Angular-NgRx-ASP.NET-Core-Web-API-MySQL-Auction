@@ -1,0 +1,51 @@
+import { HttpHelper } from './../../shared/helpers/http.helper';
+import { mergeMap } from 'rxjs/operators';
+import { environment } from './../../../environments/environment';
+import { HttpClient } from '@angular/common/http';
+import { Observable, of } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { IPaginator } from '../models/paginator.interface';
+import { IUser } from '../models/user.interface';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class UserService {  
+
+  constructor(private httpClient: HttpClient) { }
+
+  public getUsers(searchTerm: string, pageIndex: number, pageSize: number): Observable<IPaginator<IUser>> {
+
+    const usersUrl = `${environment.apiUrl + environment.apiUsers}`;    
+    const params = HttpHelper.getPaginatorParams(null, searchTerm, pageIndex, pageSize);
+
+    return this.httpClient.get<IPaginator<IUser>>(usersUrl, { params: params }).pipe(
+      mergeMap(data => {        
+        return of(data);
+      })
+    );
+  }
+
+  public submit(id: number, firstName: string, lastName: string, email: string, role: string): Observable<any> {
+
+    const formData: any = new FormData();
+    formData.append("id", id);
+    formData.append("firstName", firstName);
+    formData.append("lastName", lastName);
+    formData.append("email", email);
+    formData.append("role", role);
+
+    const userUpdateUrl = `${environment.apiUrl + environment.apiUser}`;    
+    return this.httpClient.put(userUpdateUrl, formData, {      
+      reportProgress: true,
+      observe: 'events'
+    });
+  }
+
+  public deleteUser(id: number): Observable<any> {
+
+    const userDeleteUrl = `${environment.apiUrl + environment.apiUser + id}`;    
+    return this.httpClient.delete(userDeleteUrl);
+  }
+
+}

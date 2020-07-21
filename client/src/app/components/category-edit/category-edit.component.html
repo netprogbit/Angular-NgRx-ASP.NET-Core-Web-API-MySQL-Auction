@@ -1,0 +1,32 @@
+<mat-card>
+    <mat-card-title>{{title}}</mat-card-title>
+    <form [formGroup]="editForm" (ngSubmit)="onSubmit()">
+      <div class="container">
+        <mat-form-field>
+          <input matInput placeholder="ID" formControlName="id" readonly>
+          <mat-error *ngIf="efc.id.errors?.required">
+            ID name is required
+          </mat-error>
+        </mat-form-field>                               
+        <mat-form-field>
+          <input matInput placeholder="Name" formControlName="name">
+          <mat-error *ngIf="efc.name.errors?.required">
+            Name is required
+          </mat-error>
+        </mat-form-field>                                            
+        <img *ngIf="imageUrl" [src]="imageUrl">        
+        <button mat-flat-button type="button" color="primary" (click)='fileinput.click()'>
+          <mat-icon>attach_file</mat-icon>
+          Choose Image         
+        </button>      
+        <input #fileinput hidden type='file' (change)='select($event)'>            
+      </div>
+      <ng-container *ngIf="progress$ | async; let progress">
+        <mat-progress-bar mode="determinate" value="{{progress}}" *ngIf="progress > 0"></mat-progress-bar>
+      </ng-container>           
+      <div class="action-button">
+        <button mat-flat-button type="submit" [disabled]="editForm.invalid" color="primary">Save</button>
+        <button mat-flat-button type="button" (click)="onCancel()" color="primary">Cancel</button>
+      </div>    
+    </form>
+  </mat-card>

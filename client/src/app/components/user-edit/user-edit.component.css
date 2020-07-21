@@ -1,0 +1,33 @@
+mat-card, form, .container, .image {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+}
+
+.container {
+    width: 100%;
+    min-height: 150px;
+    max-height: 400px;
+    overflow: auto;
+}
+
+mat-form-field {
+    height: 100%;
+}
+
+img {
+    max-width: 250px;
+    margin: 5px;
+}
+
+.image a {
+    align-self: stretch;
+}
+
+.action-button {
+    align-self: center;
+}
+
+.mat-flat-button {
+    margin: 10px;
+}

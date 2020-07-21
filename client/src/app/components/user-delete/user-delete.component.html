@@ -1,0 +1,29 @@
+<mat-card>
+    <mat-card-title>{{title}}</mat-card-title>
+    <div class="container">
+        <mat-form-field>
+            <mat-label>Id</mat-label>
+            <textarea matInput [value]="data.id" readonly></textarea>
+        </mat-form-field>                
+        <mat-form-field>
+            <mat-label>First Name</mat-label>
+            <textarea matInput [value]="data.firstName" readonly></textarea>
+        </mat-form-field>        
+        <mat-form-field>
+            <mat-label>Last Name</mat-label>
+            <textarea matInput [value]="data.lastName" readonly></textarea>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Email</mat-label>
+            <textarea matInput [value]="data.email" readonly></textarea>
+        </mat-form-field>         
+        <mat-form-field>
+            <mat-label>Role</mat-label>
+            <textarea matInput [value]="data.role" readonly></textarea>
+        </mat-form-field>  
+    </div>
+    <div class="action-button">
+        <button mat-flat-button (click)="onDelete()" color="primary">Delete</button>
+        <button mat-flat-button (click)="onCancel()" color="primary">Cancel</button>
+    </div>
+</mat-card>

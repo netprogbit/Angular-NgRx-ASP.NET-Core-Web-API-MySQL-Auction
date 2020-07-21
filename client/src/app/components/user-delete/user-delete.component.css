@@ -1,0 +1,24 @@
+mat-card, .container {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+}
+
+.container {
+    width: 100%;
+    min-height: 150px;
+    max-height: 400px;
+    overflow: auto;
+}
+
+mat-form-field {
+    height: 100%;
+}
+
+.action-button {
+    align-self: center;
+}
+
+.mat-flat-button {
+    margin: 10px;
+}

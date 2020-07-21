@@ -1,0 +1,46 @@
+<mat-card>
+  <mat-card-title>Create account</mat-card-title>
+  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+    <mat-form-field>
+      <input matInput placeholder="First Name" formControlName="firstName">
+      <mat-error *ngIf="efc.firstName.errors?.required">
+        First Name is required
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput placeholder="Last Name" formControlName="lastName">
+      <mat-error *ngIf="efc.lastName.errors?.required">
+        Last Name is required
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput placeholder="Email" formControlName="email">
+      <mat-error *ngIf="efc.email?.invalid">
+        <div *ngIf="efc.email?.errors?.required">
+          Email is required
+        </div>
+        <div *ngIf="efc.email?.errors?.email">
+          Email is invalid
+        </div>
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput placeholder="Password" formControlName="password">
+      <mat-error *ngIf="efc.password?.invalid">
+        <div *ngIf="efc.password?.errors?.required">Password is required</div>        
+        <div *ngIf="efc.password?.errors?.minlength && efc.password?.errors?.minlength?.requiredLength">
+          Password must be at least {{efc.password?.errors?.minlength?.requiredLength}} characters.            
+        </div>        
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput placeholder="Confirm Password" formControlName="confirmPassword">
+      <mat-error *ngIf="efc.confirmPassword?.invalid">
+        <div *ngIf="efc.confirmPassword?.errors?.required">Confirm password is required</div>
+        <div *ngIf="efc.confirmPassword?.errors?.mustMatch">Passwords must match</div>
+      </mat-error>
+    </mat-form-field>
+    <button class="submit" mat-raised-button type="submit" [disabled]="registerForm.invalid || registerForm.disabled"
+      color="primary">Register</button>
+  </form>
+</mat-card>
