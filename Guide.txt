@@ -1,4 +1,4 @@
-MariaDB Server must be installed. Set UTF-8 encoding for it if required.
+MariaDB Server must be installed (MariaDB-10.4.12 was used). Set UTF-8 encoding for it if required.
 
 Verify that the password of the ConnectionStrings section of the appsettings.json file of the server project matches the MariaDB server password.
 
