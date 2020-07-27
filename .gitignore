@@ -1,7 +1,7 @@
 ## Ignore files
 
-# Visual Studio or Angular or node js packages
-node_modules/
+# Angular packages
+client/node_modules/
 
 # Visual Studio Build results
 [Dd]ebug/
