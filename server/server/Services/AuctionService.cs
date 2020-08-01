@@ -52,7 +52,7 @@ namespace Server.Services
         catch (Exception e)
         {
           dbContextTransaction.Rollback();  // Rollbacking
-          throw new Exception("DB Transaction Failed. Rollback Changes. " + e.Message);
+          throw new ApplicationException("DB Transaction Failed. Rollback Changes. " + e.Message);
         }
       }
 
