@@ -4,7 +4,7 @@ import { mergeMap, map } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { environment } from './../../../environments/environment';
-import { Injectable } from '@angular/core';
+import { Injectable  } from '@angular/core';
 import { IPaginator } from '../models/paginator.interface';
 
 @Injectable({
@@ -14,10 +14,8 @@ export class CategoryService {
   
   constructor(private httpClient: HttpClient) { }
 
-  public getAllCategories(): Observable<ICategory[]> {
-    
+  public getAllCategories(): Observable<ICategory[]> {    
     const categoryUrl = `${environment.apiUrl + environment.apiAllCategories}`;            
-
     return this.httpClient.get<any>(categoryUrl).pipe(
       map(categories => {        
         return categories.map(category => {
@@ -28,10 +26,8 @@ export class CategoryService {
   }
 
   public getCategories(searchTerm: string, pageIndex: number, pageSize: number): Observable<IPaginator<ICategory>> {
-
     const categoryUrl = `${environment.apiUrl + environment.apiCategories}`;    
     const params = HttpHelper.getPaginatorParams(null, searchTerm, pageIndex, pageSize);    
-
     return this.httpClient.get<IPaginator<ICategory>>(categoryUrl, { params: params }).pipe(
       mergeMap(data => {        
         return of(data);
@@ -40,7 +36,6 @@ export class CategoryService {
   }
   
   public submit(id: number, name: string, imageFileName: string, imageFile: File): Observable<any> {
-
     const formData: any = new FormData();
     formData.append("id", id);    
     formData.append("name", name);    

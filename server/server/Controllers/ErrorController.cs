@@ -1,14 +1,13 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Server.Helpers;
+using Server.Models;
 
 namespace Server.Controllers
 {
   /// <summary>
   /// Error handler features
-  /// </summary>
-  [Authorize]
+  /// </summary>  
   [Route("api/[controller]")]
   [ApiController]
   public class ErrorController : ControllerBase
@@ -25,9 +24,9 @@ namespace Server.Controllers
     /// </summary>
     /// <returns></returns>
     [HttpPost("log")]
-    public IActionResult Log()
+    public IActionResult Log(ErrorData errorData)
     {
-      _logger.LogError("{0} {1}", StringHelper.ClientError, Request.Form["message"]);
+      _logger.LogError("{0} {1}", StringHelper.ClientError, errorData.Message);
       return Ok();
     }
 

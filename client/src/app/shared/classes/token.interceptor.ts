@@ -13,10 +13,7 @@ export class TokenInterceptor implements HttpInterceptor {
 
         if (this.authService.isAuthenticated()) {
             req = req.clone({
-                setHeaders: {
-                    Authorization: 'Bearer ' + this.authService.getToken(),
-                    Accept: 'application/json'
-                }
+                setHeaders: this.authService.getHeaders()
             })
         }
 

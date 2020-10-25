@@ -5,7 +5,6 @@ import { environment } from './../../../environments/environment';
 import { Observable, Subscription } from 'rxjs';
 import { IAppState } from '../store/app/app.state';
 import { authData } from '../store/auth/auth.selectors';
-import { tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -28,23 +27,15 @@ export class AuthService implements OnDestroy {
   }
 
   public register(user: any): Observable<any> {
-
-    const registerUrl = `${environment.apiUrl + environment.apiRegister}`;
-    const formData: any = new FormData();
-    formData.append("firstName", user.firstName);
-    formData.append("lastName", user.lastName);
-    formData.append("email", user.email);
-    formData.append("password", user.password);
-    return this.httpClient.post<any>(registerUrl, formData);
+    const registerUrl = `${environment.apiUrl + environment.apiRegister}`;    
+    const body = { firstName: user.firstName,  lastName: user.lastName, email: user.email, password: user.password };
+    return this.httpClient.post<any>(registerUrl, body);
   }
 
   public login(user: any): Observable<any> {
-
     const loginUrl = `${environment.apiUrl + environment.apiLogin}`;
-    const formData: any = new FormData();
-    formData.append("email", user.email);
-    formData.append("password", user.password);
-    return this.httpClient.post<any>(loginUrl, formData);
+    const body = { email: user.email, password: user.password };             
+    return this.httpClient.post<any>(loginUrl, body);
   }
 
   public setAuth(userId: number, role: string, token: string) {
@@ -53,18 +44,21 @@ export class AuthService implements OnDestroy {
     this.token = token;
   }
 
-  getUserId(): number {
+  public getUserId(): number {
     return this.userId;
   }
 
-  getRole(): string {
+  public getRole(): string {
     return this.role;
   }
 
-  getToken(): string {
-    return this.token
+  public getHeaders(): any {
+    return {
+      'Authorization': 'Bearer ' + this.token,
+      'Accept': 'application/json'
+    };
   }
-
+  
   public isAuthenticated(): boolean {
     return !!this.token;
   }

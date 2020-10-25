@@ -15,16 +15,10 @@ export class ErrorService {
     this.httpWithoutInterceptor = new HttpClient(httpBackend); // It prevents interceptor looping if log method will throws error
   }
 
-  public log(message: string): Observable<any> {
-
-    const formData: any = new FormData();
-    formData.append("message", message);    
+  public log(message: string): Observable<any> {        
     const errorUrl = `${environment.apiUrl + environment.apiErrorLog}`;
     // Headers are required bacause http request without interceptor
-    const headers = new HttpHeaders({
-      'Authorization': 'Bearer ' + this.authService.getToken(),
-      'Accept': 'application/json'
-    }); 
-    return this.httpWithoutInterceptor.post(errorUrl, formData, { headers: headers });
+    const headers = new HttpHeaders(this.authService.getHeaders()); 
+    return this.httpWithoutInterceptor.post(errorUrl, { message }, { headers });
   }
 }

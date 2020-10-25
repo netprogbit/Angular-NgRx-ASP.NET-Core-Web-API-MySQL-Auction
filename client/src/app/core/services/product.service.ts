@@ -15,16 +15,13 @@ export class ProductService {
   constructor(private httpClient: HttpClient) { }
 
   public getProduct(id: number): Observable<any> {
-
     const productUrl = `${environment.apiUrl + environment.apiProduct + id}`;
     return this.httpClient.get<any>(productUrl);
   }
 
   public getProducts(categoryName: string, searchTerm: string, pageIndex: number, pageSize: number): Observable<IPaginator<IProduct>> {
-
     const productUrl = `${environment.apiUrl + environment.apiProducts}`;
     const params = HttpHelper.getPaginatorParams(categoryName, searchTerm, pageIndex, pageSize);
-
     return this.httpClient.get<IPaginator<IProduct>>(productUrl, { params: params }).pipe(
       mergeMap(data => {
         return of(data);
@@ -33,16 +30,12 @@ export class ProductService {
   }  
 
   public buyProduct(userId: number, productId: number): Observable<any> {
-
-    const formData: any = new FormData();
-    formData.append("userId", userId);
-    formData.append("productId", productId);
     const productBuyUrl = `${environment.apiUrl + environment.apiBuy}`;
-    return this.httpClient.post(productBuyUrl, formData);
+    const body = { userId, productId };
+    return this.httpClient.post(productBuyUrl, body);
   }
 
   public submit(id: number, categoryName: string, name: string, description: string, price: number, imageFile: File): Observable<any> {
-
     const formData: any = new FormData();
     formData.append("id", id);
     formData.append("categoryName", categoryName);
@@ -73,7 +66,6 @@ export class ProductService {
   }
 
   public deleteProduct(id: number): Observable<any> {
-
     const productDeleteUrl = `${environment.apiUrl + environment.apiProduct + id}`;
     return this.httpClient.delete(productDeleteUrl);
   }

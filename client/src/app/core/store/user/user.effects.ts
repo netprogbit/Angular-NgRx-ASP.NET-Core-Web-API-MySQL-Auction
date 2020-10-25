@@ -69,13 +69,8 @@ export class UserEffects {
         switchMap(payload => {
             return this.userService.submit(payload.id, payload.firstName, payload.lastName, payload.email, payload.role);
         }),
-        switchMap((event: HttpEvent<any>) => {
-            switch (event.type) {                
-                case HttpEventType.Response:                    
-                    return [new SubmitUserSuccess(event.body.message), new GetUsers()];
-                default:
-                    return of();
-            }
+        switchMap((data: any) => {
+            return [new SubmitUserSuccess(data.message), new GetUsers()];
         })
     );
 
