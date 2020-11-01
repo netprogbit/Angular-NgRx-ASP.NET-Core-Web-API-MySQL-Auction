@@ -2,7 +2,10 @@ using DataLayer.Abstractions;
 using DataLayer.DbContexts;
 using DataLayer.Entities;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace DataLayer.Repositories
@@ -19,14 +22,19 @@ namespace DataLayer.Repositories
             _db = db;
         }
 
-        public IQueryable<Product> GetAll()
+        public async Task<IEnumerable<Product>> FindAllAsync(Expression<Func<Product, bool>> predicate)
         {
-            return _db.Products.Include(p => p.Category);
+            return await _db.Products.AsNoTracking().Include(p => p.Category).Where(predicate).OrderBy(p => p.Id).ToListAsync();
         }
 
-        public async Task<Product> GetAsync(long id)
+        public async Task<Product> FindAsync(long id)
         {
             return await _db.Products.Include(p => p.Category).SingleOrDefaultAsync(p => p.Id == id);
+        }
+
+        public async Task<Product> FindAsync(Expression<Func<Product, bool>> predicate)
+        {
+            return await _db.Products.Include(p => p.Category).SingleOrDefaultAsync(predicate);
         }
 
         public async Task CreateAsync(Product product)

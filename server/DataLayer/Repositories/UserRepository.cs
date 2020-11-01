@@ -2,7 +2,10 @@ using DataLayer.Abstractions;
 using DataLayer.DbContexts;
 using DataLayer.Entities;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace DataLayer.Repositories
@@ -19,14 +22,19 @@ namespace DataLayer.Repositories
             _db = db;
         }
 
-        public IQueryable<User> GetAll()
+        public async Task<IEnumerable<User>> FindAllAsync(Expression<Func<User, bool>> predicate)
         {
-            return _db.Users;
+            return await _db.Users.AsNoTracking().Where(predicate).OrderBy(u => u.Id).ToListAsync();
         }
 
-        public async Task<User> GetAsync(long id)
+        public async Task<User> FindAsync(long id)
         {
             return await _db.Users.FindAsync(id);
+        }
+
+        public async Task<User> FindAsync(Expression<Func<User, bool>> predicate)
+        {
+            return await _db.Users.SingleOrDefaultAsync(predicate);
         }
 
         public async Task CreateAsync(User user)
@@ -35,7 +43,7 @@ namespace DataLayer.Repositories
         }
 
         public void Update(User user)
-        {            
+        {
             _db.Entry(user).State = EntityState.Modified;
             _db.Entry(user).Property(x => x.Password).IsModified = false;
         }

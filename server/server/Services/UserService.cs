@@ -1,8 +1,8 @@
 ﻿using DataLayer;
 using DataLayer.Entities;
-using Microsoft.EntityFrameworkCore;
 using Server.Models;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -19,10 +19,10 @@ namespace Server.Services
 
         public async Task<PaginationResult<UserResult>> GetUsersAsync(string searchTerm, int pageIndex, int pageSize )
         {
-            IQueryable<User> users = _unitOfWork.Users.GetAll().Where(u => u.LastName.Contains(searchTerm)).OrderBy(u => u.Id);
-            var count = await users.CountAsync();
-            var items = await users.Skip(pageIndex * pageSize).Take(pageSize).Select(u =>
-                new UserResult(u.Id, u.FirstName, u.LastName, u.Email, u.Role)).OrderBy(p => p.Id).ToListAsync();
+            IEnumerable<User> users = await _unitOfWork.Users.FindAllAsync(u => u.LastName.Contains(searchTerm));
+            var count = users.Count();
+            var items = users.Skip(pageIndex * pageSize).Take(pageSize).Select(u =>
+                new UserResult(u.Id, u.FirstName, u.LastName, u.Email, u.Role)).OrderBy(p => p.Id).ToList();
 
             return new PaginationResult<UserResult>(items, count);
         }
@@ -34,12 +34,12 @@ namespace Server.Services
             {
                 try
                 {
-                    User curUser = await _unitOfWork.Users.GetAll().AsNoTracking().SingleOrDefaultAsync(u => u.Id == user.Id);
-                    curUser.FirstName = user.FirstName;
-                    curUser.LastName = user.LastName;
-                    curUser.Email = user.Email;
-                    curUser.Role = user.Role;
-                    _unitOfWork.Users.Update(curUser);
+                    User currUser = await _unitOfWork.Users.FindAsync(user.Id);
+                    currUser.FirstName = user.FirstName;
+                    currUser.LastName = user.LastName;
+                    currUser.Email = user.Email;
+                    currUser.Role = user.Role;
+                    _unitOfWork.Users.Update(currUser);
                     await _unitOfWork.SaveAsync();
                     dbContextTransaction.Commit();
                 }

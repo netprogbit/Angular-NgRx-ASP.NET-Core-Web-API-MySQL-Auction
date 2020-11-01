@@ -1,7 +1,6 @@
 ﻿using DataLayer;
 using DataLayer.Entities;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 using Server.Helpers;
 using Server.Models;
 using System;
@@ -22,15 +21,16 @@ namespace Server.Services
 
         public async Task<List<CategoryResult>> GetAllCategoriesAsync()
         {
-            return await _unitOfWork.Categories.GetAll().Select(c => new CategoryResult(c.Id, c.Name, c.ImageFileName)).ToListAsync();
+            IEnumerable<Category> categories = await _unitOfWork.Categories.FindAllAsync(c => c != null);
+            return categories.Select(c => new CategoryResult(c.Id, c.Name, c.ImageFileName)).ToList();
         }
 
         public async Task<PaginationResult<CategoryResult>> GetCategoriesAsync(string searchTerm, int pageIndex, int pageSize)
         {
-            IQueryable<Category> categories = _unitOfWork.Categories.GetAll().Where(p => p.Name.Contains(searchTerm)).OrderBy(c => c.Id);
-            var count = await categories.CountAsync();
-            var items = await categories.Skip(pageIndex * pageSize).Take(pageSize).Select(c =>
-                new CategoryResult(c.Id, c.Name, c.ImageFileName)).ToListAsync();
+            IEnumerable<Category> categories = await _unitOfWork.Categories.FindAllAsync(p => p.Name.Contains(searchTerm));
+            var count = categories.Count();
+            var items = categories.Skip(pageIndex * pageSize).Take(pageSize).Select(c =>
+                new CategoryResult(c.Id, c.Name, c.ImageFileName)).ToList();
 
             return new PaginationResult<CategoryResult>(items, count);
         }
@@ -74,7 +74,7 @@ namespace Server.Services
             {
                 try
                 {
-                    Category category = await _unitOfWork.Categories.GetAll().AsNoTracking().SingleOrDefaultAsync(c => c.Id == Int64.Parse(request.Form["id"]));
+                    Category category = await _unitOfWork.Categories.FindAsync(Int64.Parse(request.Form["id"]));
                     oldFileName = category.ImageFileName;
                     category.Name = request.Form["name"];
 

@@ -1,11 +1,11 @@
 ﻿using DataLayer;
 using DataLayer.Entities;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Server.Helpers;
 using Server.Models;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -26,17 +26,17 @@ namespace Server.Services
 
         public async Task<ProductResult> GetProductAsync(long id)
         {
-            Product product = await _unitOfWork.Products.GetAsync(id);
+            Product product = await _unitOfWork.Products.FindAsync(id);
             return new ProductResult(product.Id, new CategoryResult(product.Category.Id, product.Category.Name, product.Category.ImageFileName),
                 product.Name, product.Description, PriceHelper.IntToDecimal(product.Price), PriceHelper.IntToDecimal(product.SellerPrice), product.ImageFileName, product.Bidder);
         }
 
         public async Task<PaginationResult<ProductResult>> GetProductsAsync(string categoryName, string searchTerm, int pageIndex, int pageSize)
-        {
-            IQueryable<Product> products = _unitOfWork.Products.GetAll().Where(p => p.Category.Name.Contains(categoryName)).Where(p => p.Name.Contains(searchTerm)).OrderBy(p => p.Id);
-            var count = await products.CountAsync();
-            var items = await products.Skip(pageIndex * pageSize).Take(pageSize).Select(p => new ProductResult(p.Id, new CategoryResult(p.Category.Id, p.Category.Name, p.Category.ImageFileName),
-                p.Name, p.Description, PriceHelper.IntToDecimal(p.Price), PriceHelper.IntToDecimal(p.SellerPrice), p.ImageFileName, p.Bidder)).ToListAsync();
+        {           
+            IEnumerable<Product> products = await _unitOfWork.Products.FindAllAsync(p => p.Category.Name.Contains(categoryName) && p.Name.Contains(searchTerm));
+            var count = products.Count();
+            var items = products.Skip(pageIndex * pageSize).Take(pageSize).Select(p => new ProductResult(p.Id, new CategoryResult(p.Category.Id, p.Category.Name, p.Category.ImageFileName),
+                p.Name, p.Description, PriceHelper.IntToDecimal(p.Price), PriceHelper.IntToDecimal(p.SellerPrice), p.ImageFileName, p.Bidder)).ToList();
 
             return new PaginationResult<ProductResult>(items, count);
         }
@@ -53,7 +53,7 @@ namespace Server.Services
                 try
                 {
                     Product product = new Product();
-                    Category category = await _unitOfWork.Categories.GetAll().AsNoTracking().SingleOrDefaultAsync(c => c.Name == request.Form["categoryName"]);
+                    Category category = await _unitOfWork.Categories.FindAsync(c => c.Name == request.Form["categoryName"]);
                     product.CategoryId = category.Id;
                     product.Name = request.Form["name"];
                     product.Description = request.Form["description"];
@@ -87,9 +87,9 @@ namespace Server.Services
             {
                 try
                 {
-                    Product product = await _unitOfWork.Products.GetAll().AsNoTracking().SingleOrDefaultAsync(p => p.Id == Int64.Parse(request.Form["id"]));
+                    Product product = await _unitOfWork.Products.FindAsync(Int64.Parse(request.Form["id"]));
                     oldFileName = product.ImageFileName;
-                    Category category = await _unitOfWork.Categories.GetAll().AsNoTracking().SingleOrDefaultAsync(c => c.Name == request.Form["categoryName"]);
+                    Category category = await _unitOfWork.Categories.FindAsync(c => c.Name == request.Form["categoryName"]);
                     product.CategoryId = category.Id;
                     product.Name = request.Form["name"];
                     product.Description = request.Form["description"];
@@ -119,7 +119,7 @@ namespace Server.Services
 
         public async Task DeleteAsync(long id)
         {
-            Product product = await _unitOfWork.Products.GetAll().AsNoTracking().SingleOrDefaultAsync(p => p.Id == id);
+            Product product = await _unitOfWork.Products.FindAsync(id);
 
             // Product deleting DB transaction
             using (var dbContextTransaction = _unitOfWork.BeginTransaction())
@@ -139,7 +139,7 @@ namespace Server.Services
 
             FileHelper.DeleteFile(product.ImageFileName); // Detele unnecessary image file            
             await _auctionService.StopSale(id); // Stopping sale      
-            User userBidder = await _unitOfWork.Users.GetAsync(product.Bidder);
+            User userBidder = await _unitOfWork.Users.FindAsync(product.Bidder);
 
             if (userBidder != null)
             {

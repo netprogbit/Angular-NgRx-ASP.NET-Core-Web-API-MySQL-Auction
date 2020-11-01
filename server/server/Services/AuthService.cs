@@ -1,6 +1,5 @@
 using DataLayer;
 using DataLayer.Entities;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Server.Helpers;
@@ -35,7 +34,7 @@ namespace Server.Services
         {            
             // Check if the user exists with this email
 
-            User candidate = await _unitOfWork.Users.GetAll().SingleOrDefaultAsync(u => u.Email == user.Email);
+            User candidate = await _unitOfWork.Users.FindAsync(u => u.Email == user.Email);
 
             if (candidate != null)
                 return false;
@@ -66,7 +65,7 @@ namespace Server.Services
         {
             // Check if the user exists with this email and password
 
-            User candidate = await _unitOfWork.Users.GetAll().SingleOrDefaultAsync(u => u.Email == email && u.Password == GetPasswordHash(password, _salt));
+            User candidate = await _unitOfWork.Users.FindAsync(u => u.Email == email && u.Password == GetPasswordHash(password, _salt));
 
             if (candidate == null)
                 return null;
