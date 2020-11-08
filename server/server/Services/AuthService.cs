@@ -8,6 +8,7 @@ using Server.Settings;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Runtime.ExceptionServices;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -51,10 +52,10 @@ namespace Server.Services
                     await _unitOfWork.SaveAsync();
                     dbContextTransaction.Commit();
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
                     dbContextTransaction.Rollback();  // Rollbacking transaction                      
-                    throw new ApplicationException("DB Transaction Failed. Rollback Changes. " + e.Message);
+                    ExceptionDispatchInfo.Capture(ex).Throw();
                 }
             }
 

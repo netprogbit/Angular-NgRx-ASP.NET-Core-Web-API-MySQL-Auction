@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.SignalR;
 using Server.Helpers;
 using Server.Hubs;
 using System;
+using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 
 namespace Server.Services
@@ -49,10 +50,10 @@ namespace Server.Services
                     await _unitOfWork.SaveAsync();
                     dbContextTransaction.Commit();
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
                     dbContextTransaction.Rollback();  // Rollbacking
-                    throw new ApplicationException("DB Transaction Failed. Rollback Changes. " + e.Message);
+                    ExceptionDispatchInfo.Capture(ex).Throw();
                 }
             }
 
