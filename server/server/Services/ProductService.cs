@@ -1,5 +1,5 @@
-﻿using DataLayer;
-using DataLayer.Entities;
+﻿using DataLayer.Entities;
+using DataLayer.UnitOfWork;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Server.Helpers;
@@ -12,13 +12,13 @@ using System.Threading.Tasks;
 
 namespace Server.Services
 {
-    public class ProductService
-    {        
-        private readonly UnitOfWork _unitOfWork;
-        private readonly AuctionService _auctionService;
+    public class ProductService : IProductService
+    {
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IAuctionService _auctionService;
         protected readonly ILogger<ProductService> _logger;
 
-        public ProductService(UnitOfWork unitOfWork, AuctionService auctionService, ILogger<ProductService> logger)
+        public ProductService(IUnitOfWork unitOfWork, IAuctionService auctionService, ILogger<ProductService> logger)
         {
             _logger = logger;
             _unitOfWork = unitOfWork;
@@ -33,7 +33,7 @@ namespace Server.Services
         }
 
         public async Task<PaginationResult<ProductResult>> GetProductsAsync(string categoryName, string searchTerm, int pageIndex, int pageSize)
-        {           
+        {
             IEnumerable<Product> products = await _unitOfWork.Products.FindAllAsync(p => p.Category.Name.Contains(categoryName) && p.Name.Contains(searchTerm));
             var count = products.Count();
             var items = products.Skip(pageIndex * pageSize).Take(pageSize).Select(p => new ProductResult(p.Id, new CategoryResult(p.Category.Id, p.Category.Name, p.Category.ImageFileName),
@@ -146,7 +146,7 @@ namespace Server.Services
             {
                 _logger.LogError("{0} User ID: {1}. Product info:  {2} | {3} | ${4}, ", StringHelper.EmailMessageNotSent, product.Bidder, product.Name, product.Description, PriceHelper.IntToDecimal(product.Price));
                 EmailHelper.Send(userBidder.Email); // Send info to the buyer about the purchase of the product
-            }           
+            }
         }
     }
 }

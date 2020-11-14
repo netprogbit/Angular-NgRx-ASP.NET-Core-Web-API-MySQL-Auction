@@ -1,5 +1,5 @@
-﻿using DataLayer;
-using DataLayer.Entities;
+﻿using DataLayer.Entities;
+using DataLayer.UnitOfWork;
 using Server.Models;
 using System;
 using System.Collections.Generic;
@@ -9,16 +9,16 @@ using System.Threading.Tasks;
 
 namespace Server.Services
 {
-    public class UserService
+    public class UserService : IUserService
     {
-        private readonly UnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public UserService(UnitOfWork unitOfWork)
+        public UserService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<PaginationResult<UserResult>> GetUsersAsync(string searchTerm, int pageIndex, int pageSize )
+        public async Task<PaginationResult<UserResult>> GetUsersAsync(string searchTerm, int pageIndex, int pageSize)
         {
             IEnumerable<User> users = await _unitOfWork.Users.FindAllAsync(u => u.LastName.Contains(searchTerm));
             var count = users.Count();

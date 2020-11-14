@@ -15,10 +15,10 @@ namespace Server.Controllers
     [ApiController]
     public class ProductController : ControllerBase
     {
-        private readonly ProductService _productService;
-        private readonly AuctionService _auctionService;
+        private readonly IProductService _productService;
+        private readonly IAuctionService _auctionService;
 
-        public ProductController(ProductService productService, AuctionService auctionService)
+        public ProductController(IProductService productService, IAuctionService auctionService)
         {
             _productService = productService;
             _auctionService = auctionService;

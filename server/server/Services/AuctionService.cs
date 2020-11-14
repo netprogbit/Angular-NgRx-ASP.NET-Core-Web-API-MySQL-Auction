@@ -1,5 +1,5 @@
-using DataLayer;
 using DataLayer.Entities;
+using DataLayer.UnitOfWork;
 using Microsoft.AspNetCore.SignalR;
 using Server.Helpers;
 using Server.Hubs;
@@ -12,12 +12,12 @@ namespace Server.Services
     /// <summary>
     /// Auction actions service
     /// </summary>
-    public class AuctionService
+    public class AuctionService : IAuctionService
     {
         private readonly IHubContext<AuctionHub> _auctionHub;
-        private readonly UnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public AuctionService(IHubContext<AuctionHub> auctionHub, UnitOfWork unitOfWork)
+        public AuctionService(IHubContext<AuctionHub> auctionHub, IUnitOfWork unitOfWork)
         {
             _auctionHub = auctionHub;
             _unitOfWork = unitOfWork;

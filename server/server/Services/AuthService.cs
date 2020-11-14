@@ -1,5 +1,5 @@
-using DataLayer;
 using DataLayer.Entities;
+using DataLayer.UnitOfWork;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Server.Helpers;
@@ -18,13 +18,13 @@ namespace Server.Services
     /// <summary>
     /// Authentication actions service
     /// </summary>
-    public class AuthService
+    public class AuthService : IAuthService
     {
         private readonly AppSettings _appSettings;
-        private readonly UnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly string _salt;
 
-        public AuthService(IOptions<AppSettings> appSettings, UnitOfWork unitOfWork)
+        public AuthService(IOptions<AppSettings> appSettings, IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
             _appSettings = appSettings.Value;
@@ -32,7 +32,7 @@ namespace Server.Services
         }
 
         public async Task<bool> RegisterAsync(User user)
-        {            
+        {
             // Check if the user exists with this email
 
             User candidate = await _unitOfWork.Users.FindAsync(u => u.Email == user.Email);
@@ -42,7 +42,7 @@ namespace Server.Services
 
             user.Password = GetPasswordHash(user.Password, _salt);
             user.Role = "user";
-            
+
             // DB Transaction
             using (var dbContextTransaction = _unitOfWork.BeginTransaction())
             {

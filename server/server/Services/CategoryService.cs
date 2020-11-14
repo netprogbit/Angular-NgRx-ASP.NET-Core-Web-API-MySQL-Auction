@@ -1,5 +1,5 @@
-﻿using DataLayer;
-using DataLayer.Entities;
+﻿using DataLayer.Entities;
+using DataLayer.UnitOfWork;
 using Microsoft.AspNetCore.Http;
 using Server.Helpers;
 using Server.Models;
@@ -11,11 +11,11 @@ using System.Threading.Tasks;
 
 namespace Server.Services
 {
-    public class CategoryService
+    public class CategoryService : ICategoryService
     {
-        private readonly UnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public CategoryService(UnitOfWork unitOfWork)
+        public CategoryService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
@@ -61,7 +61,7 @@ namespace Server.Services
                 }
             }
 
-            await FileHelper.AddImageAsync(file, newFileName);            
+            await FileHelper.AddImageAsync(file, newFileName);
         }
 
         public async Task UpdateCategoryAsync(HttpRequest request)

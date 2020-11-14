@@ -1,15 +1,16 @@
-using DataLayer.DbContexts;
+﻿using DataLayer.DbContexts;
+using DataLayer.Entities;
 using DataLayer.Repositories;
 using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Threading.Tasks;
 
-namespace DataLayer
+namespace DataLayer.UnitOfWork
 {
     /// <summary>
     /// UnitOfWork pattern for auction database
     /// </summary>
-    public class UnitOfWork : IDisposable
+    public class UnitOfWork : IUnitOfWork, IDisposable
     {
         private readonly AuctionDbContext _db;
 
@@ -18,15 +19,14 @@ namespace DataLayer
             _db = db;
         }
 
-        private CategoryRepository _categoryRepository;
-        public CategoryRepository Categories => _categoryRepository ?? (_categoryRepository = new CategoryRepository(_db));
+        private IRepository<Category> _categoryRepository;
+        public IRepository<Category> Categories => _categoryRepository ?? (_categoryRepository = new CategoryRepository(_db));
 
+        private IRepository<Product> _productRepository;
+        public IRepository<Product> Products => _productRepository ?? (_productRepository = new ProductRepository(_db));
 
-        private ProductRepository _productRepository;
-        public ProductRepository Products => _productRepository ?? (_productRepository = new ProductRepository(_db));
-
-        private UserRepository _userRepository;
-        public UserRepository Users => _userRepository ?? (_userRepository = new UserRepository(_db));
+        private IRepository<User> _userRepository;
+        public IRepository<User> Users => _userRepository ?? (_userRepository = new UserRepository(_db));
 
         public IDbContextTransaction BeginTransaction()
         {

@@ -1,5 +1,5 @@
-using DataLayer;
 using DataLayer.DbContexts;
+using DataLayer.UnitOfWork;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -59,12 +59,12 @@ namespace Server
             });
 
             services.AddDbContext<AuctionDbContext>(options => options.UseMySql(Configuration.GetConnectionString("DefaultConnection")));
-            services.AddScoped<UnitOfWork>();
-            services.AddScoped<UserService>();
-            services.AddScoped<CategoryService>();
-            services.AddScoped<ProductService>();
-            services.AddScoped<AuctionService>();
-            services.AddScoped<AuthService>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<ICategoryService, CategoryService>();
+            services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<IAuctionService, AuctionService>();
+            services.AddScoped<IAuthService, AuthService>();
 
             services.AddCors(options =>
             {
