@@ -84,7 +84,7 @@ export class AuctionEffects {
             return this.productService.buyProduct(payload.userId, payload.productId);
         }),
         switchMap((data: any) => {
-            return of(new BuyProductSuccess(data.message));
+            return of(new BuyProductSuccess(data));
         })
     );
 

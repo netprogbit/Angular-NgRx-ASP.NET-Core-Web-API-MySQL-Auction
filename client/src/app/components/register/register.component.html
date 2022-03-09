@@ -2,17 +2,11 @@
   <mat-card-title>Create account</mat-card-title>
   <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
     <mat-form-field>
-      <input matInput placeholder="First Name" formControlName="firstName">
-      <mat-error *ngIf="efc.firstName.errors?.required">
-        First Name is required
+      <input matInput placeholder="User Name" formControlName="userName">
+      <mat-error *ngIf="efc.userName.errors?.required">
+        User Name is required
       </mat-error>
-    </mat-form-field>
-    <mat-form-field>
-      <input matInput placeholder="Last Name" formControlName="lastName">
-      <mat-error *ngIf="efc.lastName.errors?.required">
-        Last Name is required
-      </mat-error>
-    </mat-form-field>
+    </mat-form-field>    
     <mat-form-field>
       <input matInput placeholder="Email" formControlName="email">
       <mat-error *ngIf="efc.email?.invalid">

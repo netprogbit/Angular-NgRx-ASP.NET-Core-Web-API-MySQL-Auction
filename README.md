@@ -1,4 +1,4 @@
-# Angular NgRx ASP.NET Core Web API MySQL Auction training project
+# Angular NgRx ASP.NET Core Web API MySQL Auction pet-project
 ## Used technologies
 ### Front-end
 * Angular 8;
@@ -8,9 +8,9 @@
 * Validation;
 * RxJS;
 * Guard;
-* JWT Authentication and access control by role;
-* SignalR;
+* JWT Authentication (access and refresh tokens)
 * ngx-permissions;
+* SignalR;
 * Global exeption and http error handling;
 * Logging;
 * etc.
@@ -18,13 +18,19 @@
 * ASP.NET Core Web API;
 * MySQL(MariaDB);
 * Entity Framework (Code First);
+* Redis;
+* Identity;
+* JWT Authentication (access and refresh tokens)
+* Access control by role;
 * SignalR;
-* JWT Authentication and access control by role;
-* Repository;
+* Clean architecture;
+* Multiple DB contexts;
+* Generic repository;
 * UnitOfWork;
 * Database transaction;
 * LINQ;
 * Asynchronous programming;						
 * Global error handling;
+* AutoMapper;
 * NLog;
 * etc.

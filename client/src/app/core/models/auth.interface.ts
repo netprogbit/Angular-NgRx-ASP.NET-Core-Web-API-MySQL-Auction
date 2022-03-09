@@ -1,5 +1,6 @@
 export interface IAuth {
-    userId: number,    
-    role: string,
-    token: string,        
+    userId: string,        
+    token: string,
+    refreshToken: string,
+    roles: string[],        
 }

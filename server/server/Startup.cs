@@ -1,91 +1,147 @@
-using DataLayer.DbContexts;
-using DataLayer.UnitOfWork;
+using DataLayer.Contexts;
+using DataLayer.Entities.Account;
+using LogicLayer.Helpers;
+using LogicLayer.Hubs;
+using LogicLayer.Interfaces;
+using LogicLayer.InterfacesOut.Auction;
+using LogicLayer.InterfacesOut.Account;
+using LogicLayer.Services;
+using LogicLayer.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-using Server.Helpers;
-using Server.Hubs;
+using Microsoft.OpenApi.Models;
 using Server.Middlewares;
-using Server.Services;
-using Server.Settings;
-using System.IO;
+using System;
+using System.Text;
+using DataLayer.UnitOfWorks.Account;
+using DataLayer.UnitOfWorks.Auction;
 
 namespace Server
 {
     public class Startup
     {
-        protected readonly ILogger<Startup> _logger;
-
-        public Startup(IConfiguration configuration, ILogger<Startup> logger)
+        public Startup(IWebHostEnvironment env)
         {
-            Configuration = configuration;
-            StaticConfig = configuration;
-            _logger = logger;
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(env.ContentRootPath)
+                .AddJsonFile("appsettings.json", true, true)
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", true)
+                .AddEnvironmentVariables();
+
+            Configuration = builder.Build();
+
+            // Set helpers
+            ConfigurationHelper.Configuration = Configuration;
+            FileHelper.WebRootPath = env.WebRootPath;
         }
 
         public IConfiguration Configuration { get; }
-        public static IConfiguration StaticConfig { get; private set; } // For use by static classes
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
 
-            services.AddAuthentication(opt =>
-            {
-                opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = JwtHelper.Issuer,
-                    ValidAudience = JwtHelper.Audience,
-                    IssuerSigningKey = JwtHelper.GetSymmetricSecurityKey()
-                };
-            });
+            // Account DB
 
-            services.AddDbContext<AuctionDbContext>(options => options.UseMySql(Configuration.GetConnectionString("DefaultConnection")));
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
-            services.AddScoped<IUserService, UserService>();
-            services.AddScoped<ICategoryService, CategoryService>();
-            services.AddScoped<IProductService, ProductService>();
-            services.AddScoped<IAuctionService, AuctionService>();
+            var userDbConnectionString = Configuration.GetConnectionString("Account");
+
+            services.AddDbContext<AccountDbContext>(optionsBuilder =>
+                optionsBuilder.UseMySql(
+                    userDbConnectionString,
+                    ServerVersion.AutoDetect(userDbConnectionString)
+                )
+            );
+
+            services.AddIdentity<User, Role>()
+                .AddEntityFrameworkStores<AccountDbContext>();
+
+            // Auction DB
+
+            var auctionDbConnectionString = Configuration.GetConnectionString("Auction");
+
+            services.AddDbContext<AuctionDbContext>(optionsBuilder =>
+                optionsBuilder.UseMySql(
+                    auctionDbConnectionString,
+                    ServerVersion.AutoDetect(auctionDbConnectionString)
+                )
+            );
+
+            services.AddScoped<IAccountUnitOfWork, AccountUnitOfWork>();
+            services.AddScoped<IAuctionUnitOfWork, AuctionUnitOfWork>();
+            services.AddSingleton<ICacheService, CacheService>(); 
+            services.AddScoped<IJwtService, JwtService>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<ICategoryService, CategoryService>();
+            services.AddScoped<IAuctionService, AuctionService>();
 
             services.AddCors(options =>
             {
+                var clientUrl = Configuration["AppSettings:UrlClient"];
+
                 options.AddPolicy("CorsPolicy",
-                    builder => builder.WithOrigins(Configuration["AppSettings:UrlClient"])
+                    builder => builder.WithOrigins(clientUrl)
                     .AllowAnyMethod()
                     .AllowAnyHeader()
                     .AllowCredentials()
                     .Build());
             });
 
+            var secret = Configuration["AppSettings:Secret"];
+            var key = Encoding.UTF8.GetBytes(secret);
+
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero,
+            };
+
+            services.AddSingleton(tokenValidationParameters);
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(jwt =>
+            {
+                jwt.SaveToken = true;
+                jwt.TokenValidationParameters = tokenValidationParameters;
+            });
+
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = Configuration.GetConnectionString("Redis");
+            });
+
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddSignalR();
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddControllersWithViews();
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Server", Version = "v1" });
+            });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseSwagger();
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Server v1"));
             }
             else
             {
@@ -93,39 +149,19 @@ namespace Server
                 app.UseHsts();
             }
 
-            // HTTP error handling
-            app.UseStatusCodePagesWithReExecute("/error", "?code={0}");
-            app.Map("/error", ap => ap.Run(async context =>
-            {
-                var code = context.Request.Query["code"];
-                _logger.LogError(StringHelper.HttpErrorStatus + code);
-                await context.Response.WriteAsync($"Err: {code}");
-            }));
-
             app.UseDefaultFiles();
             app.UseStaticFiles();
-
-            app.UseAuthentication();
-
-            // Use folder node_modules
-            app.UseFileServer(new FileServerOptions()
-            {
-                FileProvider = new PhysicalFileProvider(
-                    Path.Combine(env.ContentRootPath, "node_modules")
-                ),
-                RequestPath = "/node_modules",
-                EnableDirectoryBrowsing = false
-            });
-
             app.UseHttpsRedirection();
             app.UseCors("CorsPolicy");
-            app.UseSignalR(routes =>
-            {
-                routes.MapHub<AuctionHub>("/auction");
-            });
-            app.UseMvc();
+            app.UseRouting();
+            app.UseAuthentication();
+            app.UseAuthorization();
 
-            FileHelper.HostingEnvironment = env; // Set hosting environment for file helper
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapHub<PriceHub>("/price");
+                endpoints.MapControllers();
+            });
         }
     }
 }

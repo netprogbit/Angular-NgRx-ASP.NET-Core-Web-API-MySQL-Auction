@@ -21,7 +21,6 @@ export class ProductEditComponent implements OnInit {
   
   public progress$: Observable<number> = this.store.pipe(select(progress));
   public allCategories$: Observable<ICategory[]> = this.store.pipe(select(allCategories));
-  public selectedCategoryName: string;
   public editForm: FormGroup;
   public title: string;  
   public imageUrl: any;        
@@ -33,8 +32,7 @@ export class ProductEditComponent implements OnInit {
 
     this.title = this.data.title;
     this.imageUrl = `${environment.apiUrl + environment.imgFolder + environment.defaultImg}`;
-    this.store.dispatch(new GetAllCategories(null));    
-    this.selectedCategoryName = this.data.categoryName;
+    this.store.dispatch(new GetAllCategories(null));        
 
     this.editForm = this.formBuilder.group({
       id: ['', Validators.required],
@@ -44,13 +42,14 @@ export class ProductEditComponent implements OnInit {
       price: ['', [Validators.required, Validators.pattern("([0-9]{1,7}[,][0-9]{2})")]],      
       image: [null]
     });
-
+    
     if (this.data.id === 0) {            
       this.editForm.get('id').setValue(0);      
       this.editForm.get('price').setValue('0,00');
     }
     else {      
-      this.editForm.get('id').setValue(this.data.id);      
+      this.editForm.get('id').setValue(this.data.id);
+      this.editForm.get('categoryName').setValue(this.data.categoryName);      
       this.editForm.get('name').setValue(this.data.name);
       this.editForm.get('description').setValue(this.data.description);
       this.editForm.get('price').setValue(this.data.price);                  

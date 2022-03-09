@@ -7,6 +7,8 @@ import {
     Login,
     LoginSuccess,
     AuthActionTypes,
+    Logout,
+    LogoutSuccess,
 } from './auth.actions';
 import { of } from 'rxjs';
 import { switchMap, map, tap } from 'rxjs/operators';
@@ -24,7 +26,7 @@ export class AuthEffects {
             return this.authService.register(payload);
         }),        
         switchMap((data) => {
-            return of(new RegisterSuccess(data.message));
+            return of(new RegisterSuccess(data));
         })
     );
 
@@ -56,10 +58,35 @@ export class AuthEffects {
         map(action => action.payload),
         tap((payload) => {
             localStorage.setItem('userId', payload.userId);
-            localStorage.setItem('role', payload.role);
             localStorage.setItem('token', payload.token);
+            localStorage.setItem('refreshToken', payload.refreshToken);
+            localStorage.setItem("roles", JSON.stringify(payload.roles));
             this.router.navigate(['/products']);
-        })        
+        })
+    );
+
+    @Effect()
+    logout$ = this.actions$.pipe(
+        ofType<Logout>(AuthActionTypes.Logout),
+        switchMap(() => {
+            return this.authService.revokeToken();
+        }),
+        switchMap((data) => {
+            this.snackBar.open(data, 'OK', { duration: 3000 });
+            return of(new LogoutSuccess());
+        })
+    );
+
+    @Effect({ dispatch: false })
+    logoutSuccess$ = this.actions$.pipe(
+        ofType<LogoutSuccess>(AuthActionTypes.LogoutSuccess),
+        tap(() => {
+            localStorage.removeItem('userId');
+            localStorage.removeItem('token');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem("roles");
+            this.router.navigate(['/login']);
+        })
     );
 
     constructor(

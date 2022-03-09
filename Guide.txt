@@ -1,6 +1,14 @@
-MariaDB Server must be installed (MariaDB-10.4.12 was used). Set UTF-8 encoding for it if required.
+Redis must be installed on port 6379 (Redis-x64-3.2.100.msi was used).
+
+MariaDB Server must be installed (mariadb-10.7.3-winx64.msi was used). Set UTF-8 encoding for it if required.
 
 Verify that the password of the ConnectionStrings section of the appsettings.json file of the server project matches the MariaDB server password.
+
+To create the required databases (accountdb and auctiondb), run the following commands from the Package Manager Console:
+
+	Update-Database -Context AccountDbContext
+
+	Update-Database -Context AuctionDbContext
 
 The client project needs to install node modules (npm install).	
 
@@ -13,6 +21,10 @@ password: 111111
 User
 login: ivan@gmail.com
 password: 222222
+
+User
+login: valya@gmail.com
+password: 333333
 
 Selling a product starts from a moment when the administrator added it to the database.
 

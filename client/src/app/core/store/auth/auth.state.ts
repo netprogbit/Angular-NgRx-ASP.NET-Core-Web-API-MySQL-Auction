@@ -5,5 +5,5 @@ export interface IAuthState {
 }
 
 export const initialAuthState: IAuthState = {
-    authData: { userId: 0, role: null, token: null }, 
+    authData: { userId: '', token: '', refreshToken: '', roles: [] },
 };

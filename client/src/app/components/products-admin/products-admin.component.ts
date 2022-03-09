@@ -18,7 +18,7 @@ import { IPaginator } from 'src/app/core/models/paginator.interface';
 })
 export class ProductsAdminComponent implements OnInit {
 
-  public displayedColumns: string[] = ['id', 'categoryName', 'name', 'description', 'price', 'sellerPrice', 'imageFileName', 'bidder', 'actions'];    
+  public displayedColumns: string[] = ['id', 'categoryName', 'name', 'description', 'price', 'sellerPrice', 'imageFileName', 'bidderEmail', 'actions'];    
   public paginator$: Observable<IPaginator<IProduct>> = this.store.pipe(select(paginator));
   public searchTerm$: Observable<string> = this.store.pipe(select(searchTerm));    
 

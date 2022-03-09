@@ -75,7 +75,7 @@ export class ProductEffects {
                 case HttpEventType.UploadProgress:                    
                     return of(new ChangeProgress(Math.round(event.loaded / event.total * 100)));
                 case HttpEventType.Response:                                        
-                    return [new SubmitProductSuccess(event.body.message), new GetProducts()];
+                    return [new SubmitProductSuccess(event.body), new GetProducts()];
                 default:
                     return of();
             }
@@ -99,7 +99,7 @@ export class ProductEffects {
             return this.productService.deleteProduct(id);
         }),
         tap(data => {
-            this.snackBar.open(data.message, 'OK', { duration: 3000 });
+            this.snackBar.open(data, 'OK', { duration: 3000 });
         }),
         switchMap(() => {
             return of(new GetProducts());

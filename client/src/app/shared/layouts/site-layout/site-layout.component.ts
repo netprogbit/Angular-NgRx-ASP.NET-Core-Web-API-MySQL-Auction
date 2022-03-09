@@ -2,6 +2,9 @@ import { Router } from '@angular/router';
 import { AuthService } from './../../../core/services/auth.service';
 import { Component, OnInit } from '@angular/core';
 import { NgxPermissionsService } from 'ngx-permissions';
+import { Store } from '@ngrx/store';
+import { IAppState } from 'src/app/core/store/app/app.state';
+import { Logout } from 'src/app/core/store/auth/auth.actions';
 
 @Component({
   selector: 'app-site-layout',
@@ -10,16 +13,14 @@ import { NgxPermissionsService } from 'ngx-permissions';
 })
 export class SiteLayoutComponent implements OnInit {
 
-  constructor(private authService: AuthService, private router: Router, private permissionsService: NgxPermissionsService) { }
+  constructor(private store: Store<IAppState>, private authService: AuthService, private router: Router, private permissionsService: NgxPermissionsService) { }
 
   ngOnInit() { 
-    const role = this.authService.getRole();           
-    this.permissionsService.loadPermissions([ role ]);
+    const roles = this.authService.getRoles();           
+    this.permissionsService.loadPermissions(roles);
   }
 
-  logout(event: Event) {
-    event.preventDefault()
-    this.authService.logout()
-    this.router.navigate(['/login'])
+  logout() {
+    this.store.dispatch(new Logout());       
   }
 }

@@ -24,9 +24,9 @@ export class UserService {
     );
   }
 
-  public submit(id: number, firstName: string, lastName: string, email: string, role: string): Observable<any> {    
+  public submit(id: number, userName: string, email: string): Observable<any> {    
     const userUpdateUrl = `${environment.apiUrl + environment.apiUser}`;
-    const body = { id, firstName, lastName, email, role };
+    const body = { id, userName, email };
     return this.httpClient.put(userUpdateUrl, body);
   }
 

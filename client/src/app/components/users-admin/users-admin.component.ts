@@ -18,7 +18,7 @@ import { ChangePaginator } from 'src/app/core/store/product/product.actions';
 })
 export class UsersAdminComponent implements OnInit {
 
-  public displayedColumns: string[] = ['id', 'firstName', 'lastName', 'email', 'role', 'actions'];
+  public displayedColumns: string[] = ['id', 'userName', 'email', 'actions'];
   public paginator$: Observable<IPaginator<IUser>> = this.store.pipe(select(paginator));
   public searchTerm$: Observable<string> = this.store.pipe(select(searchTerm));
 
@@ -37,17 +37,17 @@ export class UsersAdminComponent implements OnInit {
     this.store.dispatch(new GetUsers());
   }
   
-  public edit(i: number, id: number, firstName: string, lastName: string, email: string, role: string) {
+  public edit(i: number, id: number, userName: string, email: string) {
 
     this.dialog.open(UserEditComponent, {
-      data: { title: "Editing User", id: id, firstName: firstName, lastName: lastName, email: email, role: role }
+      data: { title: "Editing User", id: id, userName: userName, email: email }
     });
   }
 
-  public delete(i: number, id: number, firstName: string, lastName: string, email: string, role: string) {
+  public delete(i: number, id: number, userName: string, email: string) {
 
     this.dialog.open(UserDeleteComponent, {
-      data: { title: "Deleting Category", id: id, firstName: firstName, lastName: lastName, email: email, role: role }
+      data: { title: "Deleting Category", id: id, userName: userName, email: email }
     });
   }
   

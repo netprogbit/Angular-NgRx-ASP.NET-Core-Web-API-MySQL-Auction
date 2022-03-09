@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from './core/services/auth.service';
+import { Store } from '@ngrx/store';
+import { IAppState } from './core/store/app/app.state';
+import { SetAuth } from './core/store/auth/auth.actions';
 
 @Component({
   selector: 'app-root',
@@ -9,15 +11,21 @@ export class AppComponent implements OnInit {
 
   title = 'client';
 
-  constructor(private authService: AuthService) { }
+  constructor(private store: Store<IAppState>) { }
 
   ngOnInit() {
-    const userId: number = parseInt(localStorage.getItem('userId'), 10);
-    const role: string = localStorage.getItem('role');
-    const token: string = localStorage.getItem('token');
+    const userId: any = localStorage.getItem('userId');
+    const token: any = localStorage.getItem('token');
+    const refreshToken: any = localStorage.getItem('refreshToken');
+    const jsonRoles: any = localStorage.getItem("roles");    
 
-    if (userId && role && token) {
-      this.authService.setAuth(userId, role, token);
+    if (userId && token && refreshToken && jsonRoles) {
+      this.store.dispatch(new SetAuth({ 
+        userId: userId, 
+        token: token, 
+        refreshToken: refreshToken, 
+        roles: JSON.parse(jsonRoles) 
+      }));
     }
   }
 }

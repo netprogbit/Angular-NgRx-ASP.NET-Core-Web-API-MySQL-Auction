@@ -11,7 +11,7 @@ import { ChangeSellerPrice } from '../store/auction/auction.actions';
 export class SignalrService implements OnDestroy {
 
   private hubConnection: signalR.HubConnection;
-  private auctionHubUrl = environment.apiUrl + environment.apiAuction;
+  private auctionHubUrl = environment.apiUrl + environment.apiPrice;
   private productId: string;   
  
   constructor(private store: Store<IAppState>) { }

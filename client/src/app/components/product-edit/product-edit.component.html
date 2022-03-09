@@ -9,7 +9,7 @@
         </mat-error>
       </mat-form-field>      
       <mat-form-field>               
-        <mat-select [ngModel]="selectedCategoryName" placeholder="Select category" formControlName="categoryName">
+        <mat-select placeholder="Select category" formControlName="categoryName">
           <mat-option *ngFor="let category of allCategories$ | async" [value]="category.name">
             {{category.name}}
           </mat-option>

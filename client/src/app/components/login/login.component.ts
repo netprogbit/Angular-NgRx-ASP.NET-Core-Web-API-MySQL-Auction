@@ -2,9 +2,6 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { ActivatedRoute, Params } from '@angular/router';
-import { MatSnackBar } from '@angular/material';
-import { StringHelper } from 'src/app/shared/helpers/string.helper';
 import { IAppState } from 'src/app/core/store/app/app.state';
 import { Login } from 'src/app/core/store/auth/auth.actions';
 
@@ -18,7 +15,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   public loginForm: FormGroup;  
   private paramsSubscript: Subscription;
 
-  constructor(private store: Store<IAppState>, private snackBar: MatSnackBar, private formBuilder: FormBuilder, private route: ActivatedRoute) { }
+  constructor(private store: Store<IAppState>, private formBuilder: FormBuilder) { }
 
   ngOnInit() {
     

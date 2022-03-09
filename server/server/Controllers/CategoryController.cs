@@ -1,10 +1,12 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using AutoMapper;
+using LogicLayer.Helpers;
+using LogicLayer.Interfaces;
+using LogicLayer.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Server.Helpers;
-using Server.Models;
-using Server.Services;
+using Server.DTOs;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Server.Controllers
 {
@@ -12,14 +14,16 @@ namespace Server.Controllers
     /// Category actions
     /// </summary>
     [Authorize]
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("[controller]")]
     public class CategoryController : ControllerBase
     {
+        private readonly IMapper _mapper;
         private readonly ICategoryService _categoryService;
 
-        public CategoryController(ICategoryService categoryService)
+        public CategoryController(IMapper mapper, ICategoryService categoryService)
         {
+            _mapper = mapper;
             _categoryService = categoryService;
         }
 
@@ -27,7 +31,12 @@ namespace Server.Controllers
         /// Get categories completely
         /// </summary>
         [HttpGet("allcategories")]
-        public async Task<List<CategoryResult>> GetAllCategories() => await _categoryService.GetAllCategoriesAsync();
+        public async Task<IEnumerable<CategoryDTO>> GetAllCategories()
+        {
+            var categoryModels = await _categoryService.GetAllCategoriesAsync();
+            var categoryDTOs = _mapper.Map<IEnumerable<CategoryDTO>>(categoryModels);
+            return categoryDTOs;
+        }
 
         /// <summary>
         /// Getting categories according to pagination
@@ -37,30 +46,38 @@ namespace Server.Controllers
         /// <param name="pageSize">for pagination</param>
         /// <returns>Category pagination data</returns>
         [HttpGet("categories")]
-        public async Task<PaginationResult<CategoryResult>> GetCategories(string searchTerm = "", int pageIndex = 0, int pageSize = 10) => await _categoryService.GetCategoriesAsync(searchTerm, pageIndex, pageSize);
+        public async Task<PaginationDTO<CategoryDTO>> GetCategoryPage(string searchTerm = "", int pageIndex = 0, int pageSize = 10)
+        {
+            var paginationModel = await _categoryService.GetCategoryPageAsync(searchTerm, pageIndex, pageSize);
+            var paginationDTO = _mapper.Map<PaginationDTO<CategoryDTO>>(paginationModel);
+            return paginationDTO;
+        }
 
         /// <summary>
         /// Create category
         /// </summary>
         /// <returns>OK message</returns>
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost("")]
-        public async Task<IActionResult> Add()
+        public async Task<IActionResult> AddCategory([FromForm] CategoryDTO categoryDTO)
         {
-            await _categoryService.AddCategoryAsync(Request);
-            return Ok(new { message = StringHelper.AdditionSuccefully });
+            var categoryModel = _mapper.Map<CategoryModel>(categoryDTO);
+            await _categoryService.AddCategoryAsync(categoryModel);
+            return Ok(StringHelper.AdditionSuccessfully);
         }
+
 
         /// <summary>
         /// Update category
         /// </summary>
         /// <returns>Success message</returns>
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPut("")]
-        public async Task<IActionResult> Update()
+        public async Task<IActionResult> UpdateCategory([FromForm] CategoryDTO categoryDTO)
         {
-            await _categoryService.UpdateCategoryAsync(Request);
-            return Ok(new { message = StringHelper.UpdationSuccefully });
+            var categoryModel = _mapper.Map<CategoryModel>(categoryDTO);
+            await _categoryService.UpdateCategoryAsync(categoryModel);
+            return Ok(StringHelper.UpdationSuccessfully);
         }
     }
 }

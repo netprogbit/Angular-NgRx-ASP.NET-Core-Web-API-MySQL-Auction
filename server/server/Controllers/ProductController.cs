@@ -1,9 +1,11 @@
-using System.Threading.Tasks;
+﻿using AutoMapper;
+using LogicLayer.Helpers;
+using LogicLayer.Interfaces;
+using LogicLayer.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Server.Helpers;
-using Server.Models;
-using Server.Services;
+using Server.DTOs;
+using System.Threading.Tasks;
 
 namespace Server.Controllers
 {
@@ -11,17 +13,17 @@ namespace Server.Controllers
     /// Product actions
     /// </summary>
     [Authorize]
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("[controller]")]
     public class ProductController : ControllerBase
     {
+        private readonly IMapper _mapper;
         private readonly IProductService _productService;
-        private readonly IAuctionService _auctionService;
 
-        public ProductController(IProductService productService, IAuctionService auctionService)
+        public ProductController(IMapper mapper, IProductService productService)
         {
+            _mapper = mapper;
             _productService = productService;
-            _auctionService = auctionService;
         }
 
         /// <summary>
@@ -30,7 +32,12 @@ namespace Server.Controllers
         /// <param name="id">Product Id</param>
         /// <returns>Product for client</returns>
         [HttpGet("{id}")]
-        public async Task<ProductResult> GetProduct(long id) => await _productService.GetProductAsync(id);
+        public async Task<ProductDTO> GetProduct(long id)
+        {
+            var productModel = await _productService.GetProductByIdAsync(id);
+            var productDTO = _mapper.Map<ProductDTO>(productModel);
+            return productDTO;
+        }
 
         /// <summary>
         /// Getting products according to pagination
@@ -41,53 +48,49 @@ namespace Server.Controllers
         /// <param name="pageSize">for pagination</param>
         /// <returns>Product pagination data</returns>
         [HttpGet("products")]
-        public async Task<PaginationResult<ProductResult>> GetProducts(string categoryName = "", string searchTerm = "", int pageIndex = 0, int pageSize = 10) => await _productService.GetProductsAsync(categoryName, searchTerm, pageIndex, pageSize);
-
-        /// <summary>
-        /// Bid offer
-        /// </summary>
-        /// <returns>Bid price</returns>
-        [HttpPost("buy")]
-        public async Task<IActionResult> Buy(Buy buy)
+        public async Task<PaginationDTO<ProductDTO>> GetProductPage(string categoryName = "", string searchTerm = "", int pageIndex = 0, int pageSize = 10)
         {
-            decimal price = await _auctionService.Buy(buy.UserId, buy.ProductId);
-            return Ok(new { message = StringHelper.PurchaseRequestAccepted + price });
+            var paginationModel = await _productService.GetProductPageAsync(categoryName, searchTerm, pageIndex, pageSize);
+            var paginationDTO = _mapper.Map<PaginationDTO<ProductDTO>>(paginationModel);
+            return paginationDTO;
         }
 
         /// <summary>
         /// Create product
         /// </summary>
         /// <returns>OK message</returns>
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost("")]
-        public async Task<IActionResult> Add()
+        public async Task<IActionResult> AddProduct([FromForm] ProductDTO productDTO)
         {
-            await _productService.AddProductAsync(Request);
-            return Ok(new { message = StringHelper.AdditionSuccefully });
+            var productModel = _mapper.Map<ProductModel>(productDTO);
+            await _productService.AddProductAsync(productModel);
+            return Ok(StringHelper.AdditionSuccessfully);
         }
 
         /// <summary>
         /// Update product
         /// </summary>
         /// <returns>Success message</returns>
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPut("")]
-        public async Task<IActionResult> Update()
+        public async Task<IActionResult> UpdateProduct([FromForm] ProductDTO productDTO)
         {
-            await _productService.UpdateAsync(Request);
-            return Ok(new { message = StringHelper.UpdationSuccefully });
+            var productModel = _mapper.Map<ProductModel>(productDTO);
+            await _productService.UpdateProductAsync(productModel);
+            return Ok(StringHelper.UpdationSuccessfully);
         }
 
         /// <summary>
         /// Delete product by Id
         /// </summary>
         /// <returns>Succcess message</returns>
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(long id)
+        public async Task<IActionResult> DeleteProduct(long id)
         {
-            await _productService.DeleteAsync(id);
-            return Ok(new { message = StringHelper.DeleteSuccefully });
-        }        
+            await _productService.DeleteProductAsync(id);
+            return Ok(StringHelper.DeleteSuccefully);
+        }
     }
 }

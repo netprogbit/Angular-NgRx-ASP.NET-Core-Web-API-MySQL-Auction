@@ -9,7 +9,41 @@ export const authReducer = (state = initialAuthState, action: AuthActions): IAut
                 authData: {
                     ...state.authData,
                     userId: action.payload.userId,
-                    role: action.payload.role,
+                    token: action.payload.token,
+                    refreshToken: action.payload.refreshToken,
+                    roles: action.payload.roles,                                        
+                },
+            };
+        }
+        case AuthActionTypes.LogoutSuccess: {
+            return {
+                ...state,               
+                authData: {
+                    ...state.authData,
+                    userId: '',
+                    token: '',
+                    refreshToken: '',
+                    roles: [],                                        
+                },
+            };
+        }
+        case AuthActionTypes.SetAuth: {
+            return {
+                ...state,               
+                authData: {
+                    ...state.authData,
+                    userId: action.payload.userId,
+                    token: action.payload.token,
+                    refreshToken: action.payload.refreshToken,
+                    roles: action.payload.roles,                                        
+                },
+            };
+        }
+        case AuthActionTypes.SetToken: {
+            return {
+                ...state,               
+                authData: {
+                    ...state.authData,
                     token: action.payload.token,
                 },
             };

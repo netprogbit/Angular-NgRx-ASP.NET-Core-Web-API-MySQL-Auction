@@ -1,34 +1,33 @@
+﻿using LogicLayer.Helpers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Server.Helpers;
-using Server.Models;
+using Server.DTOs;
 
 namespace Server.Controllers
 {
-  /// <summary>
-  /// Error handler features
-  /// </summary>  
-  [Route("api/[controller]")]
-  [ApiController]
-  public class ErrorController : ControllerBase
-  {
-    protected readonly ILogger<ProductController> _logger;
-
-    public ErrorController(ILogger<ProductController> logger)
+    [Authorize]
+    [ApiController]
+    [Route("[controller]")]
+    public class ErrorController : ControllerBase
     {
-      _logger = logger;
-    }
+        protected readonly ILogger<ErrorController> _logger;
 
-    /// <summary>
-    /// Log error
-    /// </summary>
-    /// <returns></returns>
-    [HttpPost("log")]
-    public IActionResult Log(ErrorData errorData)
-    {
-      _logger.LogError("{0} {1}", StringHelper.ClientError, errorData.Message);
-      return Ok();
-    }
+        public ErrorController(ILogger<ErrorController> logger)
+        {
+            _logger = logger;
+        }
 
-  }
+        /// <summary>
+        /// Log error
+        /// </summary>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [HttpPost("log")]
+        public IActionResult Log([FromBody] ErrorDTO errorDTO)
+        {
+            _logger.LogError("{0} {1}", StringHelper.ClientError, errorDTO.Message);
+            return Ok();
+        }
+    }
 }

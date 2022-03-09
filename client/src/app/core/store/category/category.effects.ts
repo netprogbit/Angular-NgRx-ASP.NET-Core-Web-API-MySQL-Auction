@@ -15,7 +15,7 @@ import {
 } from './category.actions';
 import { Injectable } from '@angular/core';
 import { of } from 'rxjs';
-import { switchMap, map, withLatestFrom, debounceTime, distinctUntilChanged, concatMap, takeUntil, tap } from 'rxjs/operators';
+import { switchMap, map, withLatestFrom, debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
 import { paginator, searchTerm } from './category.selectors';
 import { IAppState } from '../app/app.state';
 import { IPaginator } from '../../models/paginator.interface';
@@ -90,7 +90,7 @@ export class CategoryEffects {
                 case HttpEventType.UploadProgress:
                     return of(new ChangeProgress(Math.round(event.loaded / event.total * 100)));
                 case HttpEventType.Response:
-                    return [new SubmitCategorySuccess(event.body.message), new GetCategories()];
+                    return [new SubmitCategorySuccess(event.body), new GetCategories()];
                 default:
                     return of();
             }

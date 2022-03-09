@@ -24,17 +24,13 @@ export class UserEditComponent implements OnInit {
 
     this.editForm = this.formBuilder.group({
       id: ['', Validators.required],
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
+      userName: ['', Validators.required],
       email: ['', Validators.required],
-      role: ['', Validators.required]
     });
 
     this.editForm.get('id').setValue(this.data.id);
-    this.editForm.get('firstName').setValue(this.data.firstName);
-    this.editForm.get('lastName').setValue(this.data.lastName);
+    this.editForm.get('userName').setValue(this.data.userName);
     this.editForm.get('email').setValue(this.data.email);
-    this.editForm.get('role').setValue(this.data.role);    
   }
 
   // Editing form controls getter
@@ -45,10 +41,8 @@ export class UserEditComponent implements OnInit {
   public onSubmit(): void {    
     this.store.dispatch(new SubmitUser({
       id: this.editForm.value.id,
-      firstName: this.editForm.value.firstName,
-      lastName: this.editForm.value.lastName,
+      userName: this.editForm.value.userName,
       email: this.editForm.value.email,
-      role: this.editForm.value.role,
     }));
 
     this.onCancel();

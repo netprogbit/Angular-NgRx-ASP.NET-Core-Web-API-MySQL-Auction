@@ -1,5 +1,5 @@
 import { HttpHelper } from './../../shared/helpers/http.helper';
-import { mergeMap } from 'rxjs/operators';
+import { map, mergeMap } from 'rxjs/operators';
 import { environment } from './../../../environments/environment';
 import { Observable, of } from 'rxjs';
 import { Injectable } from '@angular/core';
@@ -29,20 +29,20 @@ export class ProductService {
     );
   }  
 
-  public buyProduct(userId: number, productId: number): Observable<any> {
-    const productBuyUrl = `${environment.apiUrl + environment.apiBuy}`;
+  public buyProduct(userId: string, productId: number): Observable<any> {
+    const productBuyUrl = `${environment.apiUrl + environment.apiAuction}`;
     const body = { userId, productId };
     return this.httpClient.post(productBuyUrl, body);
   }
 
   public submit(id: number, categoryName: string, name: string, description: string, price: number, imageFile: File): Observable<any> {
-    const formData: any = new FormData();
-    formData.append("id", id);
+    const formData: FormData = new FormData();
+    formData.append("id", id.toString());
     formData.append("categoryName", categoryName);
     formData.append("name", name);
     formData.append("description", description);
-    formData.append("price", price);
-    formData.append("sellerPrice", price); // Seller price becomes equal price after creating or updating    
+    formData.append("price", price.toString());
+    formData.append("sellerPrice", price.toString()); // Seller price becomes equal price after creating or updating    
 
     if (imageFile)
       formData.append("image", imageFile);
@@ -53,7 +53,7 @@ export class ProductService {
       // Addition product
       return this.httpClient.post(productSubmitUrl, formData, {
         reportProgress: true,
-        observe: 'events'
+        observe: 'events',
       });
     }
     else {

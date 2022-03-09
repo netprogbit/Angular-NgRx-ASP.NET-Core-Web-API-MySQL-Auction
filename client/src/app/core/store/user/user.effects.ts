@@ -67,10 +67,10 @@ export class UserEffects {
         ofType<SubmitUser>(UserActionTypes.SubmitUser),
         map(action => action.payload),
         switchMap(payload => {
-            return this.userService.submit(payload.id, payload.firstName, payload.lastName, payload.email, payload.role);
+            return this.userService.submit(payload.id, payload.userName, payload.email);
         }),
         switchMap((data: any) => {
-            return [new SubmitUserSuccess(data.message), new GetUsers()];
+            return [new SubmitUserSuccess(data), new GetUsers()];
         })
     );
 
@@ -91,7 +91,7 @@ export class UserEffects {
             return this.userService.deleteUser(id);
         }),
         tap(data => {
-            this.snackBar.open(data.message, 'OK', { duration: 3000 });
+            this.snackBar.open(data, 'OK', { duration: 3000 });
         }),
         switchMap(() => {
             return of(new GetUsers());

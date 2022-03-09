@@ -37,7 +37,7 @@ export class ProductDetailComponent implements OnInit {
 
   // Bid offer
   public buy(productId: number): void {
-    const userId: number = this.authService.getUserId();
+    const userId: string = this.authService.getUserId();
     this.store.dispatch(new BuyProduct({ userId: userId, productId: productId}));
   }  
 

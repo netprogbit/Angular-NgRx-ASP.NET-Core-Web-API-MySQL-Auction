@@ -3,9 +3,9 @@
         <div>E-Auction</div>
         <div>
             <a mat-button class="navbar-link" routerLink="/products">Home</a>
-            <a *ngxPermissionsOnly="['admin']" mat-button class="navbar-link" routerLink="/users-admin">Users</a>
-            <a *ngxPermissionsOnly="['admin']" mat-button class="navbar-link" routerLink="/categories-admin">Categories</a>
-            <a *ngxPermissionsOnly="['admin']" mat-button class="navbar-link" routerLink="/products-admin">Products</a>                        
+            <a *ngxPermissionsOnly="['Admin']" mat-button class="navbar-link" routerLink="/users-admin">Users</a>
+            <a *ngxPermissionsOnly="['Admin']" mat-button class="navbar-link" routerLink="/categories-admin">Categories</a>
+            <a *ngxPermissionsOnly="['Admin']" mat-button class="navbar-link" routerLink="/products-admin">Products</a>                        
             <a mat-button class="navbar-link" (click)="logout($event)">Sign out</a>
         </div>
     </mat-toolbar>

@@ -19,7 +19,6 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { CategoryEditComponent } from './components/category-edit/category-edit.component';
 import { UserDeleteComponent } from './components/user-delete/user-delete.component';
 import { UserEditComponent } from './components/user-edit/user-edit.component';
-import { TokenInterceptor } from './shared/classes/token.interceptor';
 import { AppErrorHandler } from './shared/classes/app-error.handler';
 import { HttpErrorInterceptor } from './shared/classes/http-error.interceptor';
 
@@ -58,17 +57,12 @@ import { HttpErrorInterceptor } from './shared/classes/http-error.interceptor';
     {
       provide: ErrorHandler,
       useClass: AppErrorHandler,
-    },
-    {
-      provide: HTTP_INTERCEPTORS,
-      multi: true,
-      useClass: TokenInterceptor
-    },
+    },    
     {
       provide: HTTP_INTERCEPTORS,
       multi: true,
       useClass: HttpErrorInterceptor
-    }
+    },
   ], 
   bootstrap: [AppComponent]
 })

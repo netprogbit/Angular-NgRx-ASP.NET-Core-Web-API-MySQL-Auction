@@ -13,9 +13,9 @@ export class AdminGuard implements CanActivate, CanActivateChild {
   // Alows only administrator
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
 
-    const role: string = this.authService.getRole();
+    const roles: string[] = this.authService.getRoles();
 
-    if (role === 'admin') {
+    if (roles.includes('Admin')) {
       return of(true);
     }
     else {

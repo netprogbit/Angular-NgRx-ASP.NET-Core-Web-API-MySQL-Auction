@@ -8,5 +8,5 @@ export interface IProduct {
     price: number,
     sellerPrice: number,
     imageFileName: string,
-    owner: number
+    bidderEmail: string
 }
